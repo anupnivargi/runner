@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd $OPENSHIFT_REPO_DIR
+app_ctl.sh stop
+nohup bundle exec ruby app.rb > $OPENSHIFT_LOG_DIR/server1.log 2>&1  &
