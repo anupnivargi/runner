@@ -20,7 +20,7 @@ class RequestHandler < EM::Connection
 end
 
 EM.run do
-  host, port = "0.0.0.0", ENV['PORT'] || 8080
+  host, port = ENV['OPENSHIFT_INTERNAL_IP'] || "0.0.0.0", ENV['PORT'] || ENV['OPENSHIFT_INTERNAL_PORT'] || 8080
   puts "Starting on #{host}:#{port}"
   EM.start_server host, port, RequestHandler
 end
