@@ -8,9 +8,4 @@
 #pushd ${OPENSHIFT_REPO_DIR} > /dev/null
 #bundle exec rake db:migrate RAILS_ENV="production"
 #popd > /dev/null
-echo "Stopping Server Process"
-pkill ruby
-echo "Starting Server Process"
-cd $OPENSHIFT_REPO_DIR
-nohup bundle exec ruby lib/http_server.rb > $OPENSHIFT_RUBY_LOG_DIR/server1.log 2>&1 &
-echo "Server Started"
+echo "Deploy"
