@@ -11,6 +11,8 @@
 # prevent your application from stopping cleanly or starting at all.
 # Application start and stop is subject to different timeouts
 # throughout the system.
+echo "Stop httpd server"
+app_ctl.sh stop
 echo "Starting Server Process"
 cd $OPENSHIFT_REPO_DIR
 nohup bundle exec ruby lib/http_server.rb > $OPENSHIFT_RUBY_LOG_DIR/server1.log 2>&1 &
