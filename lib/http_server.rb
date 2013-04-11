@@ -13,7 +13,7 @@ class RequestHandler < EM::Connection
     response = EM::DelegatedHttpResponse.new(self)
     response.status = 200
     response.content_type 'text/html'
-    response.content = '<center><h1>Sup?</h1></center>'
+    response.content = '<center><h1>Workkkk?</h1></center>'
     response.send_response
   end
 
