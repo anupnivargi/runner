@@ -1,0 +1,101 @@
+require "eventmachine"
+require "evma_httpserver"
+
+class String
+
+  def to_query
+    query_hash={}
+    self.split("&").each do |value|
+      k, v = value.split("=")
+      query_hash[k.to_sym] = v
+    end
+    query_hash
+  end
+end
+
+class User
+
+  attr_accessor :id, :name
+
+  def initialize(id, name)
+    @id = id
+    @name = name
+  end
+
+  def subscribe(channel)
+    channel.subscribe do |items|
+      p @id
+      p @name
+      p items
+    end
+  end
+end
+
+class Server < EM::Connection
+  include EM::HttpServer
+
+  def self.start(host = "0.0.0.0", port = 8080)
+    puts "Starting on #{host}:#{port}"
+    EM.start_server host, port, self
+  end
+
+  def post_init
+    super
+    no_environment_strings
+  end
+
+  def process_http_request
+    request = Request.new(@http_protocol, @http_cookie, @http_if_none_match, 
+                          @http_content_type, @http_path_info, @http_request_uri,
+                          @http_query_string, @http_post_content, @http_headers)
+    response = EM::DelegatedHttpResponse.new(self)
+    response.status, content_type, response.content = request.process
+    response.content_type content_type
+    response.send_response
+  end
+
+  def unbind
+  end
+
+end
+
+class UrlHandler
+
+  def initialize(path, method)
+
+  end
+
+end
+
+  class Request
+    def initialize(protocol, cookies, none_match, content_type, path_info,
+                  request_uri, query_string, post_content, headers)
+      @protocol = protocol
+      @cookies = cookies
+      @none_match = none_match
+      @content_type = content_type
+      @path_info = path_info
+      @request_uri = request_uri
+      @query_string = query_string
+      @post_content = post_content
+      @headers = headers
+    end
+
+    def process
+      # params = @http_query_string.to_query
+      # user = User.new(params[:name].hash, params[:name])
+      # user.subscribe(GlobalChannel)
+      # GlobalChannel << {:message => params[:message]}
+      p self
+      return [200, "text/html", "Hello World"]
+    end
+  end
+
+  EM.run do
+    Signal.trap("INT"){ EM.stop }
+    Signal.trap("TERM"){ EM.stop }
+    EM.epoll if EM.epoll?
+    host, port = ENV['OPENSHIFT_INTERNAL_IP'] || "0.0.0.0", ENV['PORT'] || ENV['OPENSHIFT_INTERNAL_PORT'] || 8080
+    GlobalChannel = EM::Channel.new
+    Server.start
+  end
